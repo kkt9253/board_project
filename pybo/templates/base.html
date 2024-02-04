@@ -12,8 +12,12 @@
 </head>
 <body>
 <!-- 기본 템플릿 안에 삽입될 내용 Start -->
+<!-- 네비게이션바 -->
+{% include "navbar.html" %}
 {% block content %}
 {% endblock %}
 <!-- 기본 템플릿 안에 삽입될 내용 End -->
+<!-- Bootstrap JS -->
+<script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
 </body>
 </html>
