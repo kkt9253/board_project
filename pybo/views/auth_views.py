@@ -1,3 +1,5 @@
+import functools
+
 from flask import Blueprint, url_for, render_template, request, flash, session, g
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import redirect
@@ -35,7 +37,11 @@ def login():
     if error is None:
       session.clear()
       session['user_id'] = user.id
-      return redirect(url_for('main.index'))
+      _next = request.args.get('next', '')
+      if _next:
+        return redirect(_next)
+      else:
+        return redirect(url_for('main.index'))
     flash(error)
   return render_template('auth/login.html', form=form)
 
@@ -53,3 +59,13 @@ def load_logged_in_user():
     g.user = None
   else:
     g.user = User.query.get(user_id)
+
+
+def login_required(view):
+  @functools.wraps(view)
+  def wrapped_view(*args, **kwargs):
+    if g.user is None:
+      _next = request.url if request.method == 'GET' else ''
+      return redirect(url_for('auth.login', next=_next))
+    return view(*args, **kwargs)
+  return wrapped_view

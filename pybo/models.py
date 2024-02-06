@@ -6,6 +6,8 @@ class Question(db.Model): # Question 모델을 통해 테이블이 생성되면 
   subject = db.Column(db.String(200), nullable=False)
   content = db.Column(db.Text(), nullable=False)
   create_date = db.Column(db.DateTime(), nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+  user = db.relationship('User', backref=db.backref('question_set'))
 
 class Answer(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -15,6 +17,8 @@ class Answer(db.Model):
   question = db.relationship('Question', backref=db.backref('answer_set'))
   content = db.Column(db.Text(), nullable=False)
   create_date = db.Column(db.DateTime(), nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+  user = db.relationship('User', backref=db.backref('answer_set'))
 
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
