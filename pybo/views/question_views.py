@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask import Blueprint, render_template, request, url_for, g
+from flask import Blueprint, render_template, request, url_for, g, flash
 from werkzeug.utils import redirect
 
 from pybo import db
@@ -32,3 +32,32 @@ def create():
     db.session.commit()
     return redirect(url_for('main.index'))
   return render_template('question/question_form.html', form=form)
+
+@bp.route('/modify/<int:question_id>', methods=('GET', 'POST'))
+@login_required
+def modify(question_id):
+  question = Question.query.get_or_404(question_id)
+  if g.user != question.user:
+    flash('수정권한이 없습니다.')
+    return redirect(url_for('question.detail', question_id=question_id))
+  if request.method == 'POST':
+    form = QuestionForm()
+    if form.validate_on_submit(): #  QuestionForm을 검증하고 아무 이상이 없으면 변경된 데이터를 저장
+      form.populate_obj(question) # form 변수에 들어 있는 데이터(화면에서 입력한 데이터)를 question 객체에 업데이트
+      question.modify_date = datetime.now()
+      db.session.commit()
+      return redirect(url_for('question.detail', question_id=question_id))
+  else:
+    form = QuestionForm(obj=question) # question_id에 해당하는 질문데이터를 갖음
+  return render_template('question/question_form.html', form=form)
+
+@bp.route('/delete/<int:question_id>')
+@login_required
+def delete(question_id):
+  question = Question.query.get_or_404(question_id)
+  if g.user != question.user:
+    flash('삭제권한이 없습니다.')
+    return redirect(url_for('question.detail', question_id=question_id))
+  db.session.delete(question)
+  db.session.commit()
+  return redirect(url_for('question._list'))
