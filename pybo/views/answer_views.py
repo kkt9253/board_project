@@ -36,7 +36,8 @@ def modify(answer_id):
       form.populate_obj(answer)
       answer.modify_date = datetime.now()
       db.session.commit()
-      return redirect(url_for('question.detail', question_id=answer.question.id))
+      # return redirect(url_for('question.detail', question_id=answer.question.id))
+      return redirect('{}#answer_{}'.format( url_for('question.detail', question_id=answer.question.id), answer.id))
   else:
     form = AnswerForm(obj=answer)
   return render_template('answer/answer_form.html', form=form)
@@ -51,15 +52,17 @@ def delete(answer_id):
   else:
     db.session.delete(answer)
     db.session.commit()
-  return redirect(url_for('question.detail', question_id=question_id))
+  # return redirect(url_for('question.detail', question_id=question_id))
+  return redirect('{}#answer_{}'.format( url_for('question.detail', question_id=answer.question.id), answer.id))
 
 @bp.route('/vote/<int:answer_id>/')
 @login_required
 def vote(answer_id):
-  _answer = Answer.query.get_or_404(answer_id)
-  if g.user == _answer.user:
+  answer = Answer.query.get_or_404(answer_id)
+  if g.user == answer.user:
     flash('본인이 작성한 글은 추천할 수 없습니다.')
   else:
-    _answer.voter.append(g.user)
+    answer.voter.append(g.user)
     db.session.commit()
-  return redirect(url_for('question.detail', question_id=_answer.question.id))
+  # return redirect(url_for('question.detail', question_id=_answer.question.id))
+  return redirect('{}#answer_{}'.format( url_for('question.detail', question_id=answer.question.id), answer.id))
