@@ -25,6 +25,8 @@
                 </div>
             </div>
             <div class="my-3">
+                <a href="javascript:void(0)" data-uri="{{ url_for('question.vote', question_id=question.id) }}" class="recommend btn btn-sm btn-outline-secondary"> 추천 <span class="badge rounded-pill bg-success">{{ question.voter|length }}</span>
+                </a>
                 {% if g.user == question.user %}
                 <a href="{{ url_for('question.modify', question_id=question.id) }}" class="btn btn-sm btn-outline-secondary">수정</a>
                 <a href="javascript:void(0)" class="delete btn btn-sm btn-outline-secondary" data-uri="{{ url_for('question.delete', question_id=question.id) }}">삭제</a>
@@ -51,6 +53,8 @@
                 </div>
             </div>
             <div class="my-3">
+                <a href="javascript:void(0)" data-uri="{{ url_for('answer.vote', answer_id=answer.id) }}" class="recommend btn btn-sm btn-outline-secondary"> 추천 <span class="badge rounded-pill bg-success">{{ answer.voter|length }}</span>
+                </a>
                 {% if g.user == answer.user %}
                 <a href="{{ url_for('answer.modify', answer_id=answer.id) }}" class="btn btn-sm btn-outline-secondary">수정</a>
                 <a href="#" class="delete btn btn-sm btn-outline-secondary" data-uri="{{ url_for('answer.delete', answer_id=answer.id) }}">삭제</a>
@@ -84,11 +88,20 @@
 {% endblock %}
 {% block script %}
 <!-- 자바스크립트 -->
+<!-- 위 질문코드에서 class에 delete, recommend가 포함돼있음 그것을 통해 확인 -->
 <script type='text/javascript'>
 const delete_elements = document.getElementsByClassName("delete");
 Array.from(delete_elements).forEach(function(element) {
     element.addEventListener('click', function() {
         if(confirm("정말로 삭제하시겠습니까?")) {
+            location.href = this.dataset.uri;
+        };
+    });
+});
+const recommend_elements = document.getElementsByClassName("recommend");
+Array.from(recommend_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+        if(confirm("정말로 추천하시겠습니까?")) {
             location.href = this.dataset.uri;
         };
     });

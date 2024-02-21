@@ -1,5 +1,17 @@
 from pybo import db
 
+question_voter = db.Table(
+  'question_voter',
+  db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+  db.Column('question_id', db.Integer, db.ForeignKey('question.id', ondelete='CASCADE'), primary_key=True)
+)
+
+answer_voter = db.Table(
+  'answer_voter',
+  db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True),
+  db.Column('answer_id', db.Integer, db.ForeignKey('answer.id', ondelete='CASCADE'), primary_key=True)
+)
+
 # 모델 클래스는 db.Model 클래스를 상속하여 만들어야 함 - 이때 사용한 db객체는 __init__.py에서 생성한 SQLAlchemy클래스의 객체
 class Question(db.Model): # Question 모델을 통해 테이블이 생성되면 테이블명은 question이 됨
   id = db.Column(db.Integer, primary_key=True)
@@ -9,6 +21,7 @@ class Question(db.Model): # Question 모델을 통해 테이블이 생성되면 
   user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
   user = db.relationship('User', backref=db.backref('question_set'))
   modify_date = db.Column(db.DateTime(), nullable=True)
+  voter = db.relationship('User', secondary=question_voter, backref=db.backref('question_voter_set'))
 
 class Answer(db.Model):
   id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +34,7 @@ class Answer(db.Model):
   user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
   user = db.relationship('User', backref=db.backref('answer_set'))
   modify_date = db.Column(db.DateTime(), nullable=True)
+  voter = db.relationship('User', secondary=answer_voter, backref=db.backref('answer_voter_set'))
 
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
