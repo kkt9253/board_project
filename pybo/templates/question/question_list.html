@@ -45,6 +45,7 @@
         {% endif %}
         </tbody>
     </table>
+
     <!-- 페이징처리 시작 -->
     <ul class="pagination justify-content-center">
         <!-- 이전페이지 -->
@@ -87,6 +88,7 @@
         {% endif %}
     </ul>
     <!-- 페이징처리 끝 -->
+    
 </div>
 <form id="searchForm" method="get" action="{{ url_for('question._list') }}">
     <input type="hidden" id="kw" name="kw" value="{{ kw or '' }}">

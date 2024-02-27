@@ -14,6 +14,7 @@ def _list():
     page = request.args.get('page', type=int, default=1)
     kw = request.args.get('kw', type=str, default='')
     question_list = Question.query.order_by(Question.create_date.desc())
+    # 생성 날짜 기준으로 내림차순으로 정렬
     if kw:
         search = '%%{}%%'.format(kw)
         sub_query = db.session.query(Answer.question_id, Answer.content, User.username) \
@@ -35,7 +36,10 @@ def _list():
 def detail(question_id):
   form = AnswerForm()
   question = Question.query.get_or_404(question_id)
-  return render_template('question/question_detail.html', question=question, form=form)
+  page = request.args.get('page', type=int, default=1)  # 페이지
+  answer_list = Answer.query.filter_by(question_id=question_id).order_by(Answer.create_date.desc()) # 페이지 정렬
+  answer_list = answer_list.paginate(page=page, per_page=3) # 페이징 갯수
+  return render_template('question/question_detail.html', question=question, form=form, answer_list=answer_list)
 
 @bp.route('/create/', methods=('GET', 'POST'))
 @login_required

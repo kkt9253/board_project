@@ -36,7 +36,7 @@
     </div>
     <!-- 답변 -->
     <h5 class="border-bottom my-3 py-2">{{ question.answer_set|length }}개의 답변이 있습니다.</h5>
-    {% for answer in question.answer_set %}
+    {% for answer in answer_list.items %}
     <a id="answer_{{ answer.id }}"></a>
     <div class="card my-3">
         <div class="card-body">
@@ -64,6 +64,52 @@
         </div>
     </div>
     {% endfor %}
+
+    <!-- 페이징처리 시작 -->
+    <p style="text-align: center;"><strong>답변 페이지</strong></p>
+    <ul class="pagination justify-content-center">
+        <!-- 이전페이지 -->
+        {% if answer_list.has_prev %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ answer_list.prev_num }}">이전</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">이전</a>
+        </li>
+        {% endif %}
+        <!-- 페이지번호 -->
+        {% for page_num in answer_list.iter_pages() %}
+        {% if page_num %}
+        {% if page_num != answer_list.page %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_num }}">{{ page_num }}</a>
+        </li>
+        {% else %}
+        <li class="page-item active" aria-current="page">
+            <a class="page-link" href="javascript:void(0)">{{ page_num }}</a>
+        </li>
+        {% endif %}
+        {% else %}
+        <li class="disabled">
+            <a class="page-link" href="javascript:void(0)">...</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+        <!-- 다음페이지 -->
+        {% if answer_list.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ answer_list.next_num }}">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tabindex="-1" aria-disabled="true" href="javascript:void(0)">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+    <!-- 페이징처리 끝 -->
+
+    <!-- 답변 등록란 시작 -->
     <form action="{{ url_for('answer.create', question_id=question.id) }}" method="post" class="my-3">
         {{ form.csrf_token }}
         <!-- 오류표시 Start -->
@@ -86,7 +132,9 @@
         <input type="submit" value="답변등록" class="btn btn-primary">
     </form>
 </div>
+<!-- 답변 등록란 끝 -->
 {% endblock %}
+
 {% block script %}
 <!-- 자바스크립트 -->
 <!-- 위 질문코드에서 class에 delete, recommend가 포함돼있음 그것을 통해 확인 -->
@@ -109,4 +157,3 @@ Array.from(recommend_elements).forEach(function(element) {
 });
 </script>
 {% endblock %}
-</script>
