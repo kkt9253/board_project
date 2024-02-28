@@ -36,6 +36,7 @@ class Answer(db.Model):
   modify_date = db.Column(db.DateTime(), nullable=True)
   voter = db.relationship('User', secondary=answer_voter, backref=db.backref('answer_voter_set'))
 
+
 class User(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   username = db.Column(db.String(150), unique=True, nullable=False)

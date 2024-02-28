@@ -1,9 +1,10 @@
 from datetime import datetime
 from flask import Blueprint, render_template, request, url_for, g, flash
 from werkzeug.utils import redirect
+from sqlalchemy import func
 
 from pybo import db
-from pybo.models import Question, Answer, User
+from pybo.models import Question, Answer, User, answer_voter
 from pybo.forms import QuestionForm, AnswerForm
 from pybo.views.auth_views import login_required
 
@@ -37,7 +38,20 @@ def detail(question_id):
   form = AnswerForm()
   question = Question.query.get_or_404(question_id)
   page = request.args.get('page', type=int, default=1)  # 페이지
-  answer_list = Answer.query.filter_by(question_id=question_id).order_by(Answer.create_date.desc()) # 페이지 정렬
+  sort = request.args.get('sort', 'latest')
+  if sort == 'latest':
+    answer_list = Answer.query.filter_by(question_id=question_id).order_by(Answer.create_date.desc())
+  elif sort == 'popular':
+    # 서브쿼리를 사용하여 각 답변에 대한 투표 수를 세고, 이를 기준으로 정렬
+    popular_answers_subquery = db.session.query(
+        answer_voter.c.answer_id,
+        func.count(answer_voter.c.user_id).label('num_voters')
+    ).group_by(answer_voter.c.answer_id).subquery()
+    # 인기 있는 답변들을 가져오고 투표 수에 따라 정렬
+    answer_list = db.session.query(Answer).outerjoin(
+        popular_answers_subquery,
+        Answer.id == popular_answers_subquery.c.answer_id
+    ).filter(Answer.question_id == question_id).order_by(popular_answers_subquery.c.num_voters.desc())
   answer_list = answer_list.paginate(page=page, per_page=3) # 페이징 갯수
   return render_template('question/question_detail.html', question=question, form=form, answer_list=answer_list)
 

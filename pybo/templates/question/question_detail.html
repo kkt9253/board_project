@@ -36,6 +36,10 @@
     </div>
     <!-- 답변 -->
     <h5 class="border-bottom my-3 py-2">{{ question.answer_set|length }}개의 답변이 있습니다.</h5>
+    
+    <a href="{{ url_for('.detail', question_id=question.id, sort='latest') }}" class="btn btn-primary">최신순</a>
+    <a href="{{ url_for('.detail', question_id=question.id, sort='popular') }}" class="btn btn-primary">추천순</a>
+
     {% for answer in answer_list.items %}
     <a id="answer_{{ answer.id }}"></a>
     <div class="card my-3">
