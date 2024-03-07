@@ -42,3 +42,17 @@ class User(db.Model):
   username = db.Column(db.String(150), unique=True, nullable=False)
   password = db.Column(db.String(200), nullable=False)
   email = db.Column(db.String(120), unique=True, nullable=False)
+
+class Comment(db.Model):
+  id = db.Column(db.Integer, primary_key=True)
+  question_id = db.Column(db.Integer, db.ForeignKey('question.id', ondelete='CASCADE'))
+  question = db.relationship('Question', backref=db.backref('comment_question_set'))
+  answer_id = db.Column(db.Integer, db.ForeignKey('answer.id', ondelete='CASCADE'))
+  answer = db.relationship('Answer', backref=db.backref('comment_answer_set'))
+
+  content = db.Column(db.Text(), nullable=False)
+  create_date = db.Column(db.DateTime(), nullable=False)
+  user_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
+  user = db.relationship('User', backref=db.backref('comment_set'))
+  modify_date = db.Column(db.DateTime(), nullable=True)
+  #voter = db.relationship('User', secondary=answer_voter, backref=db.backref('answer_voter_set'))

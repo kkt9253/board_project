@@ -33,8 +33,10 @@ def _list():
     question_list = question_list.paginate(page=page, per_page=10)
     return render_template('question/question_list.html', question_list=question_list, page=page, kw=kw)
 
-@bp.route('/detail/<int:question_id>/')
-def detail(question_id):
+
+@bp.route('/detail/<int:question_id>')
+@bp.route('/detail/<int:question_id>/<int:answer_id>')
+def detail(question_id, answer_id=None):
   form = AnswerForm()
   question = Question.query.get_or_404(question_id)
   page = request.args.get('page', type=int, default=1)  # 페이지
