@@ -94,8 +94,8 @@
                     {% endif %}
                 </div>
             </div>
-            <div>
-                <p>- 대댓글 -</p>
+            <div style="border: 3px solid #88cded; border-radius: 5px; padding: 10px;">
+                <p>대댓글</p>
                 <ul>
                 {% for comment in answer.comment_answer_set %}
                     <li>{{ comment.content }}</li>
